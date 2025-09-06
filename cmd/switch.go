@@ -18,6 +18,34 @@ var switchCmd = &cobra.Command{
 
 默认情况下切换 settings.json 链接，使用 --claude 标志切换 CLAUDE.md 链接。`,
 	Args: cobra.ExactArgs(1),
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		
+		manager := config.NewManager()
+		
+		claudeFlag, _ := cmd.Flags().GetBool("claude")
+		
+		var configs []config.ConfigInfo
+		var err error
+		
+		if claudeFlag {
+			configs, err = manager.ListClaudes()
+		} else {
+			configs, err = manager.ListConfigs()
+		}
+		
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveError
+		}
+		
+		var names []string
+		for _, cfg := range configs {
+			names = append(names, cfg.Name)
+		}
+		return names, cobra.ShellCompDirectiveNoFileComp
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		configName := args[0]
 		
