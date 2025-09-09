@@ -13,8 +13,13 @@ cc-manager 是一个用于管理 Claude 配置的 Go CLI 工具，支持两种�
 ## 开发命令
 
 - `go run main.go <args>` - 运行程序
-- `go build` - 构建二进制文件
+- `go build` - 构建二进制文件  
 - `go test ./...` - 运行测试
+
+## 技术要求
+
+- **Go 版本**: 1.22+
+- **主要依赖**: Cobra CLI 框架 (v1.8.1)
 
 ## CLI 命令
 
@@ -26,6 +31,13 @@ cc-manager 是一个用于管理 Claude 配置的 Go CLI 工具，支持两种�
 ### 切换命令
 - `cc-manager switch <名称>` - 切换 settings 配置
 - `cc-manager switch <名称> --claude` - 切换 CLAUDE 配置
+- 支持智能 tab 补全，根据 `--claude` 标志动态补全可用配置名
+
+### 补全命令
+- `cc-manager completion bash` - 生成 bash 补全脚本
+- `cc-manager completion zsh` - 生成 zsh 补全脚本
+- `cc-manager completion fish` - 生成 fish 补全脚本
+- `cc-manager completion powershell` - 生成 PowerShell 补全脚本
 
 ### 全局选项
 - `-v` - 启用详细日志输出
@@ -38,7 +50,8 @@ cc-manager 是一个用于管理 Claude 配置的 Go CLI 工具，支持两种�
 - `main.go`: 设置 slog 日志并启动 CLI
 - `cmd/root.go`: Cobra 根命令和全局 `-v` 标志
 - `cmd/ls.go`: 列表命令，支持 `--claude` 和 `-d` 标志
-- `cmd/switch.go`: 切换命令，支持 `--claude` 标志
+- `cmd/switch.go`: 切换命令，支持 `--claude` 标志和智能 tab 补全
+- `cmd/completion.go`: 生成各种 shell 的自动补全脚本
 - `internal/config/manager.go`: 核心管理器，处理两种配置类型
 
 **工作原理**:
