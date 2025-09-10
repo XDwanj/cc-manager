@@ -1,12 +1,14 @@
 package cmd
 
 import (
+	"cc-manager/internal/config"
 	"log/slog"
 
 	"github.com/spf13/cobra"
 )
 
 var verbose bool
+var globalClientName string
 
 var rootCmd = &cobra.Command{
 	Use:   "cc-manager",
@@ -21,6 +23,12 @@ func Execute() error {
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "显示详细日志")
+	rootCmd.PersistentFlags().StringVar(&globalClientName, "client", "", "指定客户端 (claude/codex/gemini，默认: claude)")
+	
+	// 为全局 --client 标志添加补全功能
+	rootCmd.RegisterFlagCompletionFunc("client", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return config.GetClientNames(), cobra.ShellCompDirectiveNoFileComp
+	})
 }
 
 func initConfig() {
@@ -28,4 +36,12 @@ func initConfig() {
 		slog.SetLogLoggerLevel(slog.LevelDebug)
 		slog.Debug("Debug logging enabled")
 	}
+}
+
+// GetGlobalClientName 返回全局 --client 标志的值，如果未设置则返回默认值
+func GetGlobalClientName() string {
+	if globalClientName == "" {
+		return config.GetDefaultClient().Name
+	}
+	return globalClientName
 }

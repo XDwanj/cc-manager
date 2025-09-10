@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var switchClientName string
 var switchTypeName string
 
 var switchCmd = &cobra.Command{
@@ -16,9 +15,9 @@ var switchCmd = &cobra.Command{
 	Long: `切换到指定客户端和类型的配置。
 
 例如：cc-manager switch yescode                                (默认: --client=claude --type=config)
-     cc-manager switch linus --client=claude --type=agents     (切换 claude agents 配置)
-     cc-manager switch yescode --client=codex --type=config    (切换 codex config 配置)
-     cc-manager switch custom --client=gemini --type=agents    (切换 gemini agents 配置)`,
+     cc-manager --client=claude switch linus --type=agents     (切换 claude agents 配置)
+     cc-manager --client=codex switch yescode --type=config    (切换 codex config 配置)
+     cc-manager --client=gemini switch custom --type=agents    (切换 gemini agents 配置)`,
 	Args: cobra.ExactArgs(1),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		if len(args) >= 1 {
@@ -28,10 +27,7 @@ var switchCmd = &cobra.Command{
 		manager := config.NewManager()
 		
 		// 获取客户端和类型，使用默认值
-		clientName := switchClientName
-		if clientName == "" {
-			clientName = config.GetDefaultClient().Name
-		}
+		clientName := GetGlobalClientName()
 		
 		typeName := switchTypeName
 		if typeName == "" {
@@ -53,11 +49,8 @@ var switchCmd = &cobra.Command{
 		configName := args[0]
 		manager := config.NewManager()
 		
-		// 使用标志值或默认值
-		clientName := switchClientName
-		if clientName == "" {
-			clientName = config.GetDefaultClient().Name
-		}
+		// 使用全局标志值或默认值
+		clientName := GetGlobalClientName()
 		
 		typeName := switchTypeName
 		if typeName == "" {
@@ -77,13 +70,7 @@ var switchCmd = &cobra.Command{
 }
 
 func init() {
-	switchCmd.Flags().StringVar(&switchClientName, "client", "", "指定客户端 (claude/codex/gemini，默认: claude)")
 	switchCmd.Flags().StringVar(&switchTypeName, "type", "", "指定配置类型 (config/agents，默认: config)")
-	
-	// 为 --client 标志添加补全功能
-	switchCmd.RegisterFlagCompletionFunc("client", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return config.GetClientNames(), cobra.ShellCompDirectiveNoFileComp
-	})
 	
 	// 为 --type 标志添加补全功能
 	switchCmd.RegisterFlagCompletionFunc("type", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
