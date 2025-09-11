@@ -20,6 +20,8 @@ func NewManager() *Manager {
 	return &Manager{}
 }
 
+// Switch 切换指定客户端和类型的配置文件
+// 移除现有符号链接并创建新的符号链接指向目标配置文件
 func (m *Manager) Switch(clientName, typeName, configName string) error {
 	client, err := FindClient(clientName)
 	if err != nil {
@@ -56,6 +58,8 @@ func (m *Manager) Switch(clientName, typeName, configName string) error {
 	return nil
 }
 
+// List 列出指定客户端和类型的所有可用配置
+// 扫描客户端目录下匹配模式的文件，返回配置信息列表
 func (m *Manager) List(clientName, typeName string) ([]ConfigInfo, error) {
 	client, err := FindClient(clientName)
 	if err != nil {
@@ -93,6 +97,8 @@ func (m *Manager) List(clientName, typeName string) ([]ConfigInfo, error) {
 	return configs, nil
 }
 
+// GetCurrent 获取当前生效的配置名称
+// 通过读取符号链接的目标文件路径解析出配置名
 func (m *Manager) GetCurrent(clientName, typeName string) (string, error) {
 	client, err := FindClient(clientName)
 	if err != nil {
@@ -121,11 +127,15 @@ func (m *Manager) GetCurrent(clientName, typeName string) (string, error) {
 	return configName, nil
 }
 
+// configExists 检查配置文件是否存在
+// 使用 os.Stat 检查文件系统中的文件状态
 func (m *Manager) configExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
 }
 
+// removeExistingSymlink 移除已存在的符号链接
+// 如果路径存在且是符号链接则删除，否则静默成功
 func (m *Manager) removeExistingSymlink(path string) error {
 	if _, err := os.Lstat(path); err == nil {
 		slog.Debug("Removing existing symlink", "path", path)

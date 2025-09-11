@@ -23,7 +23,7 @@ func Execute() error {
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "显示详细日志")
-	rootCmd.PersistentFlags().StringVar(&globalClientName, "client", "", "指定客户端 (claude/codex/gemini，默认: claude)")
+	rootCmd.PersistentFlags().StringVar(&globalClientName, "client", "", "指定客户端 (claude/codex/gemini/qwen，默认: claude)")
 	
 	// 为全局 --client 标志添加补全功能
 	rootCmd.RegisterFlagCompletionFunc("client", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

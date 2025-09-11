@@ -10,6 +10,7 @@ cc-manager 是一个多客户端配置管理器，通过符号链接方式管理
 - `claude` → `~/.claude/`
 - `codex` → `~/.codex/`  
 - `gemini` → `~/.gemini/`
+- `qwen` → `~/.qwen/`
 
 **支持的配置类型**：
 - `config`: 客户端设置文件 (settings.json, config.toml 等)
@@ -20,6 +21,7 @@ cc-manager 是一个多客户端配置管理器，通过符号链接方式管理
 - `go run main.go <args>` - 运行程序
 - `go build` - 构建二进制文件  
 - `go test ./...` - 运行测试
+- `go install` - 安装到 GOPATH/bin
 
 ## 技术要求
 
@@ -29,7 +31,7 @@ cc-manager 是一个多客户端配置管理器，通过符号链接方式管理
 ## CLI 命令架构
 
 ### 全局选项
-- `--client <name>` - 指定客户端 (claude/codex/gemini，默认: claude)
+- `--client <name>` - 指定客户端 (claude/codex/gemini/qwen，默认: claude)
 - `-v` - 启用详细日志输出
 
 ### 命令结构
@@ -69,13 +71,13 @@ cc-manager --client=codex switch <名称>         # 切换 codex config
 - `ConfigInfo`: 配置信息 (name, fullPath, isCurrent)
 
 **关键组件**：
-- `main.go`: slog日志初始化
-- `cmd/root.go`: 全局标志 (`--client`, `-v`) 和补全
-- `cmd/ls.go`: 列表命令，多维度筛选
-- `cmd/switch.go`: 切换命令，智能参数补全
-- `internal/config/clients.go`: 客户端和类型定义，查找函数
-- `internal/config/client.go`: Client/FileSpec 结构和路径处理
-- `internal/config/manager.go`: 符号链接操作的核心逻辑
+- `main.go`: slog日志初始化，程序入口
+- `cmd/root.go`: 全局标志 (`--client`, `-v`) 和补全，Cobra根命令
+- `cmd/ls.go`: 列表命令，多维度筛选，支持 `-d` 详细输出
+- `cmd/switch.go`: 切换命令，智能参数补全，配置验证
+- `internal/config/clients.go`: 客户端和类型定义，查找函数，默认值设置
+- `internal/config/client.go`: Client/FileSpec 结构和路径处理，用户目录解析
+- `internal/config/manager.go`: 符号链接操作的核心逻辑，原子性切换
 
 **工作原理**：
 1. 根据客户端名在 `clients.go` 查找 Client 定义
@@ -91,6 +93,8 @@ codex + config   → config.*.toml   → config.toml
 codex + agents   → AGENTS.*.md     → AGENTS.md
 gemini + config  → settings.*.json → settings.json
 gemini + agents  → GEMINI.*.md     → GEMINI.md
+qwen + config    → config.*.yaml   → config.yaml
+qwen + agents    → QWEN.*.md       → QWEN.md
 ```
 
 ## 开发约定
@@ -98,3 +102,5 @@ gemini + agents  → GEMINI.*.md     → GEMINI.md
 - 用户界面文本使用中文
 - 使用 `slog` 结构化日志，支持 `-v` 调试级别
 - 错误消息用 `fmt.Errorf` 包装上下文
+- 全局状态通过 `cmd/root.go` 中的变量管理
+- 客户端配置支持动态扩展，通过 `clients.go` 中的映射表定义
