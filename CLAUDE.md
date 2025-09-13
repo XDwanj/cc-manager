@@ -93,7 +93,7 @@ codex + config   → config.*.toml   → config.toml
 codex + agents   → AGENTS.*.md     → AGENTS.md
 gemini + config  → settings.*.json → settings.json
 gemini + agents  → GEMINI.*.md     → GEMINI.md
-qwen + config    → config.*.yaml   → config.yaml
+qwen + config    → settings.*.json → settings.json
 qwen + agents    → QWEN.*.md       → QWEN.md
 ```
 
