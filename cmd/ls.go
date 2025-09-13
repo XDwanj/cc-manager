@@ -45,19 +45,22 @@ var lsCmd = &cobra.Command{
 
 		fmt.Printf("可用的 %s %s 配置:\n", clientName, typeName)
 		for _, cfg := range configs {
+			prefix := "    "
 			if cfg.IsCurrent {
-				if showDetail {
-					fmt.Printf("  * %s (当前) - %s\n", cfg.Name, cfg.FullPath)
-				} else {
-					fmt.Printf("  * %s (当前)\n", cfg.Name)
-				}
-			} else {
-				if showDetail {
-					fmt.Printf("    %s - %s\n", cfg.Name, cfg.FullPath)
-				} else {
-					fmt.Printf("    %s\n", cfg.Name)
-				}
+				prefix = "  * "
 			}
+
+			suffix := ""
+			if showDetail {
+				suffix = fmt.Sprintf(" - %s", cfg.FullPath)
+			}
+
+			status := ""
+			if cfg.IsCurrent {
+				status = " (当前)"
+			}
+
+			fmt.Printf("%s%s%s%s\n", prefix, cfg.Name, status, suffix)
 		}
 	},
 }
